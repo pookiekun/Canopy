@@ -1,0 +1,62 @@
+﻿# ── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.whl
+
+# ── Virtual Environments ─────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+
+# ── Environment & Secrets ────────────────────────────────────────────────────
+.env
+*.env.local
+*.env.*.local
+
+# ── ML Model Cache (Hugging Face / Torch) ───────────────────────────────────
+*.pt
+*.pth
+*.onnx
+*.bin
+*.safetensors
+.cache/
+
+# ── Generated Data & Outputs ─────────────────────────────────────────────────
+data/raw_imagery/*
+data/processed/*
+data/raw/*
+data/spatial_bounds/*
+!data/raw_imagery/.gitkeep
+!data/processed/.gitkeep
+!data/raw/.gitkeep
+!data/spatial_bounds/.gitkeep
+!data/policy_docs/.gitkeep
+
+# ── Notebooks Output ─────────────────────────────────────────────────────────
+notebooks/
+*.ipynb_checkpoints/
+
+# ── IDE & OS ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/

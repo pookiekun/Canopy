@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CanopyReason | Multimodal Urban Canopy AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: rgba(17, 24, 39, 0.75);
+            --bg-glass: rgba(255, 255, 255, 0.04);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(52, 211, 153, 0.3);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.25);
+            --accent-emerald: #059669;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(59, 130, 246, 0.06) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* Top Navigation */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 0.85rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #10b981, #047857);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 0 15px var(--accent-green-glow);
+        }
+
+        .brand-text h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
+
+        .brand-text span {
+            font-size: 0.72rem;
+            color: var(--accent-green);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #6ee7b7;
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        /* Main Container */
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            display: grid;
+            grid-template-columns: 440px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1120px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Glass Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.14);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #fff;
+        }
+
+        .status-chip {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.45rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .upload-dropzone {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            background: var(--bg-glass);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .upload-dropzone:hover {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.04);
+        }
+
+        .upload-dropzone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .sample-tile-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.75rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 0.6rem;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+
+        .sample-tile-btn:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--accent-green);
+            color: #fff;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 160px;
+            border-radius: 8px;
+            margin-top: 0.75rem;
+            object-fit: cover;
+            display: none;
+            border: 1px solid var(--border-color);
+        }
+
+        textarea, select, input[type="number"], input[type="text"] {
+            width: 100%;
+            background: rgba(10, 14, 23, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.65rem 0.85rem;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.85rem;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus, select:focus, input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 2px var(--accent-green-glow);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 85px;
+        }
+
+        .preset-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+
+        .preset-pill {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .preset-pill:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 640px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            box-shadow: 0 4px 16px var(--accent-green-glow);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Results Display */
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .placeholder-state {
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 4rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .placeholder-state .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        /* Verdict Hero Banner */
+        .verdict-banner {
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+
+        .verdict-compliant {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.25));
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .verdict-noncompliant {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.25));
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .verdict-text h2 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
+        .verdict-compliant h2 { color: #34d399; }
+        .verdict-noncompliant h2 { color: #f87171; }
+
+        .verdict-text p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .metric-badge {
+            text-align: right;
+        }
+
+        .metric-badge .val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .metric-badge .lbl {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* Map Viewer */
+        .map-viewer {
+            position: relative;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .map-viewer img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .map-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: rgba(17, 24, 39, 0.9);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+        }
+
+        /* Metrics Multi-Card Grid */
+        .metrics-quad {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.15rem;
+        }
+
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: #fff;
+        }
+
+        .stat-card .sub {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Strategic Plan Box */
+        .plan-box {
+            background: rgba(10, 14, 23, 0.7);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .plan-box h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #6ee7b7;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .plan-box p {
+            font-size: 0.85rem;
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+
+        /* ─────────────────────────────────────────────────────────────────────────────
+           Phase 4: GraphRAG & XAI Component Styles
+           ───────────────────────────────────────────────────────────────────────────── */
+        .graphrag-verdict-box {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 1.1rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .verdict-headline {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #93c5fd;
+            line-height: 1.5;
+            margin-bottom: 0.4rem;
+        }
+
+        .verdict-exemption {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .section-subblock {
+            margin-top: 1rem;
+        }
+
+        .subblock-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.6rem;
+        }
+
+        .entity-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .entity-chip {
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.74rem;
+            font-weight: 500;
+        }
+
+        .constraint-table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: rgba(10, 14, 23, 0.5);
+        }
+
+        .constraint-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+        }
+
+        .constraint-table th {
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: rgba(17, 24, 39, 0.8);
+        }
+
+        .constraint-table td {
+            padding: 0.55rem 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #d1d5db;
+        }
+
+        .badge-type {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .badge-G { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .badge-C { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .badge-T { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .badge-E { background: rgba(139, 92, 246, 0.2); color: #c084fc; }
+
+        .sub-panel {
+            background: rgba(10, 14, 23, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.95rem;
+        }
+
+        .sub-panel-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #f3f4f6;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .sub-panel-list {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding-left: 1.2rem;
+            line-height: 1.6;
+        }
+
+        /* Scenarios (Phase 4 XAI) */
+        .scenario-card {
+            border-radius: 12px;
+            padding: 1.15rem;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .scenario-a {
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+
+        .scenario-b {
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+
+        .scenario-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .scenario-header h4 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .scenario-tag {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .tag-a { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .tag-b { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+
+        .scenario-desc {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        .scenario-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            padding: 0.6rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .s-metric {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .s-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .s-lbl {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .scenario-details {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .detail-row {
+            margin-bottom: 0.4rem;
+        }
+
+        .detail-row strong {
+            color: #e5e7eb;
+        }
+
+        .attention-box {
+            margin-top: 1rem;
+            background: rgba(10, 14, 23, 0.8);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            border-radius: 10px;
+            padding: 1.1rem;
+        }
+
+        .attention-title {
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: #c084fc;
+            margin-bottom: 0.45rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .attention-desc {
+            font-size: 0.82rem;
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="brand">
+            <div class="brand-logo">🌲</div>
+            <div class="brand-text">
+                <h1>CanopyReason</h1>
+                <span>Multimodal Urban Canopy Reasoning Engine</span>
+            </div>
+        </a>
+        <div class="status-pill">
+            <span class="pulse-dot"></span>
+            <span>API Online • LangGraph Multi-Agent • GraphRAG</span>
+        </div>
+    </header>
+
+    <main class="app-container">
+        <!-- Left: Control Panel -->
+        <aside>
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🛰️ Spatial & Policy Ingestion</h2>
+                </div>
+
+                <form id="analyzeForm">
+                    <!-- Image Ingestion -->
+                    <div class="form-group">
+                        <label>Optical Aerial / Satellite Imagery</label>
+                        <div class="upload-dropzone" id="dropzone">
+                            <input type="file" id="imageInput" accept="image/*">
+                            <div id="dropzoneText">
+                                <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">📷</div>
+                                <div style="font-size: 0.85rem; font-weight: 600;">Upload aerial image (PNG/JPG)</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">Drop file or click to browse</div>
+                            </div>
+                            <img id="imagePreview" class="preview-img" alt="Preview">
+                        </div>
+                        <button type="button" class="sample-tile-btn" id="loadSampleBtn">
+                            ⚡ Use Pre-Loaded Commercial Satellite Tile
+                        </button>
+                    </div>
+
+                    <!-- Policy Directive -->
+                    <div class="form-group">
+                        <label>Municipal Canopy Directive / Policy</label>
+                        <textarea id="policyInput" placeholder="Enter municipal code...">Section 4.1: All commercial zones must maintain a minimum tree canopy coverage of 20% to mitigate urban heat islands.</textarea>
+                        <div class="preset-pills">
+                            <span class="preset-pill" onclick="setPolicy('Section 4.1: All commercial zones must maintain a minimum tree canopy coverage of 20% to mitigate urban heat islands.')">Commercial (20%)</span>
+                            <span class="preset-pill" onclick="setPolicy('Municipal Code §8.3: Low-density residential districts require at least 35% mature tree canopy protection.')">Residential (35%)</span>
+                            <span class="preset-pill" onclick="setPolicy('Urban Heat Island Mitigation Overlay District: Industrial parcels require a mandatory 15% shade canopy buffer.')">Industrial Overlay (15%)</span>
+                        </div>
+                    </div>
+
+                    <!-- Socio-Ecological Demographic Parameters -->
+                    <div class="form-group">
+                        <label>Socio-Ecological & Thermal Context</label>
+                        <div class="grid-2">
+                            <div>
+                                <label style="font-size: 0.7rem;">Poverty Rate (%)</label>
+                                <input type="number" id="povertyInput" value="25.0" step="0.5" min="0" max="100">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.7rem;">Surface Temp (°C)</label>
+                                <input type="number" id="tempInput" value="31.5" step="0.1">
+                            </div>
+                        </div>
+                        <div class="grid-2" style="margin-top: 0.6rem;">
+                            <div>
+                                <label style="font-size: 0.7rem;">Biome Type</label>
+                                <select id="biomeSelect">
+                                    <option value="forest">Temperate Forest (40% baseline)</option>
+                                    <option value="grassland">Grassland (20% baseline)</option>
+                                    <option value="mediterranean">Mediterranean (20% baseline)</option>
+                                    <option value="desert">Arid / Desert (15% baseline)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.7rem;">Parcel Area (m²)</label>
+                                <input type="number" id="areaInput" value="10000" step="500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <span id="btnText">✨ Run Multimodal Assessment</span>
+                        <div class="spinner" id="btnSpinner" style="display: none;"></div>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Right: Assessment Dashboard -->
+        <section class="results-container" id="resultsSection">
+            <!-- Initial Empty State -->
+            <div class="placeholder-state" id="emptyPlaceholder">
+                <div class="icon">🌿</div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Ready for Multimodal Analysis</h3>
+                <p style="font-size: 0.85rem; max-width: 480px; margin: 0 auto;">
+                    Select or upload a satellite image and click <strong>"Run Multimodal Assessment"</strong> to invoke SegFormer vision segmentation, 3D CHM biomass inference, GraphRAG legal traversal, and counterfactual XAI.
+                </p>
+            </div>
+
+            <!-- Active Results (Initially Hidden) -->
+            <div id="resultsContent" style="display: none; display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- 1. Verdict Banner -->
+                <div id="verdictBanner" class="verdict-banner verdict-noncompliant">
+                    <div class="verdict-text">
+                        <h2 id="verdictTitle">NON-COMPLIANT (DEFICIT)</h2>
+                        <p id="verdictRationale">Extracted compliance rationale...</p>
+                    </div>
+                    <div class="metric-badge">
+                        <div class="val" id="verdictDeficitVal">19.99%</div>
+                        <div class="lbl">Canopy Deficit</div>
+                    </div>
+                </div>
+
+                <!-- 2. Visual Explainability (XAI) 4-Panel Map Viewer -->
+                <div class="card" style="padding: 1rem;">
+                    <div class="card-header" style="margin-bottom: 0.75rem;">
+                        <h3 class="card-title">🔍 Multimodal Explainability Grounding Map</h3>
+                        <span style="font-size: 0.75rem; color: var(--accent-green); font-weight: 600;">4-Panel: Optical • Mask • Heatmap • Counterfactual</span>
+                    </div>
+                    <div class="map-viewer">
+                        <img id="xaiMapImg" src="" alt="XAI Grounding Map">
+                        <div class="map-toolbar">
+                            <span id="mapMetadata">4-Panel XAI Grounding Inspection (Optical • XAI Mask • Density • Counterfactual Clearance)</span>
+                            <a id="downloadMapBtn" href="#" target="_blank" style="color: #6ee7b7; text-decoration: none; font-weight: 600;">
+                                ↗ Open Full Resolution
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Analytical Metrics Grid -->
+                <div class="metrics-quad">
+                    <!-- Vision Metric -->
+                    <div class="stat-card">
+                        <div class="label">2D Canopy Coverage</div>
+                        <div class="value" id="statCoverage" style="color: #34d399;">0.0%</div>
+                        <div class="sub" id="statCanopyArea">0 m² organic crown</div>
+                    </div>
+
+                    <!-- 3D Biomass Metric -->
+                    <div class="stat-card">
+                        <div class="label">Above-Ground Biomass</div>
+                        <div class="value" id="statAgb" style="color: #60a5fa;">0 kg</div>
+                        <div class="sub" id="statCarbon">0.0 t Carbon Stored (Chave 0.8x)</div>
+                    </div>
+
+                    <!-- Tree Equity Score -->
+                    <div class="stat-card">
+                        <div class="label">Tree Equity Score</div>
+                        <div class="value" id="statTes" style="color: #fbbf24;">0 / 100</div>
+                        <div class="sub" id="statPriority">Priority Index E: 0.0</div>
+                    </div>
+
+                    <!-- Microclimatic Cooling -->
+                    <div class="stat-card">
+                        <div class="label">Summer UTCI Cooling</div>
+                        <div class="value" id="statUtci" style="color: #a78bfa;">-0.0°C</div>
+                        <div class="sub" id="statCoolingPotential">+0.0°C potential gain</div>
+                    </div>
+                </div>
+
+                <!-- 4. Strategic Afforestation & Intervention Plan -->
+                <div class="plan-box">
+                    <h4>🌱 Multi-Agent Afforestation & Stewardship Plan</h4>
+                    <p id="interventionText">Synthesizing intervention recommendations...</p>
+                </div>
+
+                <!-- 5. GraphRAG Multi-Hop Legal Knowledge Graph Traversal (Phase 4) -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">⚖️ GraphRAG Multi-Hop Legal Knowledge Graph Traversal</h3>
+                        <span class="status-chip" id="graphragVerdictTag">Multi-Hop Traversal</span>
+                    </div>
+                    
+                    <div class="graphrag-verdict-box" id="graphragVerdictBox">
+                        <div class="verdict-headline" id="graphragVerdictText">Binding determination loading...</div>
+                        <div class="verdict-exemption" id="graphragExemptionsText">Exemptions / Variances: None identified</div>
+                    </div>
+
+                    <!-- Extracted Entities & Constraint Chips -->
+                    <div class="section-subblock">
+                        <div class="subblock-title">Extracted Legal Entities & Graph Constraints</div>
+                        <div class="entity-chips" id="graphragEntitiesContainer">
+                            <!-- Dynamic Chips -->
+                        </div>
+                        <div class="constraint-table-wrapper" id="constraintTableWrapper">
+                            <table class="constraint-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 25%;">Legal Entity</th>
+                                        <th style="width: 15%;">Type</th>
+                                        <th>Statutory Constraint / Mapping</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="constraintTableBody">
+                                    <!-- Dynamic Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Cascading Mandates & Statutory Corrective Actions -->
+                    <div class="grid-2" style="margin-top: 1rem;">
+                        <div class="sub-panel">
+                            <h5 class="sub-panel-title">⚡ Cascading Mandates Triggered</h5>
+                            <ul class="sub-panel-list" id="cascadingMandatesList">
+                                <li>None identified.</li>
+                            </ul>
+                        </div>
+                        <div class="sub-panel">
+                            <h5 class="sub-panel-title">📋 Statutory Corrective Actions</h5>
+                            <ol class="sub-panel-list" id="statutoryActionsList">
+                                <li>Actions pending...</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Multimodal Counterfactual Spatial Reasoning (Phase 4) -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🔬 XAI Counterfactual Spatial Reasoning & Attention Grounding</h3>
+                        <span class="status-chip" id="xaiConfidenceBadge">Confidence: HIGH</span>
+                    </div>
+
+                    <!-- Scenarios Grid -->
+                    <div class="grid-2 scenario-container">
+                        <!-- Scenario A: Removal -->
+                        <div class="scenario-card scenario-a">
+                            <div class="scenario-header">
+                                <span class="scenario-tag tag-a">SCENARIO A</span>
+                                <h4>Complete Canopy Removal (0%)</h4>
+                            </div>
+                            <p class="scenario-desc">Hypothetical clearance to impervious asphalt/concrete footprint.</p>
+                            <div class="scenario-metrics">
+                                <div class="s-metric">
+                                    <span class="s-val" id="scenATemp" style="color: #f87171;">+0.0°C</span>
+                                    <span class="s-lbl">Surface Temp Spike</span>
+                                </div>
+                                <div class="s-metric">
+                                    <span class="s-val" id="scenACarbon" style="color: #fb923c;">0 kg/yr</span>
+                                    <span class="s-lbl">Carbon Sequestration Lost</span>
+                                </div>
+                            </div>
+                            <div class="scenario-details">
+                                <div class="detail-row">
+                                    <strong>Statutory Impact:</strong> <span id="scenAViolations">Loading...</span>
+                                </div>
+                                <div class="detail-row">
+                                    <strong>Demographic Equity:</strong> <span id="scenAEquity">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scenario B: Compliance -->
+                        <div class="scenario-card scenario-b">
+                            <div class="scenario-header">
+                                <span class="scenario-tag tag-b">SCENARIO B</span>
+                                <h4>Full Compliance Achievement (Target %)</h4>
+                            </div>
+                            <p class="scenario-desc">Immediate expansion to statutory minimum canopy coverage threshold.</p>
+                            <div class="scenario-metrics">
+                                <div class="s-metric">
+                                    <span class="s-val" id="scenBBiomass" style="color: #34d399;">0 kg</span>
+                                    <span class="s-lbl">New Biomass Unlocked</span>
+                                </div>
+                                <div class="s-metric">
+                                    <span class="s-val" id="scenBCarbon" style="color: #38bdf8;">0 kg</span>
+                                    <span class="s-lbl">New Carbon Stored</span>
+                                </div>
+                                <div class="s-metric">
+                                    <span class="s-val" id="scenBUtci" style="color: #a78bfa;">-0.0°C</span>
+                                    <span class="s-lbl">UTCI Thermal Gain</span>
+                                </div>
+                            </div>
+                            <div class="scenario-details">
+                                <div class="detail-row">
+                                    <strong>Tree Equity Gain:</strong> <span id="scenBTes">Loading...</span>
+                                </div>
+                                <div class="detail-row">
+                                    <strong>Planting Strategy:</strong> <span id="scenBPlanting">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spatial Attention Rationale -->
+                    <div class="attention-box">
+                        <div class="attention-title">👁️ Spatial Attention Grounding & Viewpoint Invariance Rationale</div>
+                        <p class="attention-desc" id="attentionRationaleText">Evaluating pixel attention maps...</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let selectedFile = null;
+        let useSampleImage = false;
+
+        function setPolicy(text) {
+            document.getElementById('policyInput').value = text;
+        }
+
+        // Dropzone interactions
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const dropzoneText = document.getElementById('dropzoneText');
+        const loadSampleBtn = document.getElementById('loadSampleBtn');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                selectedFile = e.target.files[0];
+                useSampleImage = false;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    imagePreview.src = event.target.result;
+                    imagePreview.style.display = 'block';
+                    dropzoneText.style.display = 'none';
+                };
+                reader.readAsDataURL(selectedFile);
+            }
+        });
+
+        loadSampleBtn.addEventListener('click', () => {
+            useSampleImage = true;
+            selectedFile = null;
+            fileInput.value = '';
+            imagePreview.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><rect width="300" height="150" fill="%23223"/><text x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%234ade80" font-family="sans-serif" font-size="14">Sample Satellite Tile Selected</text></svg>';
+            imagePreview.style.display = 'block';
+            dropzoneText.style.display = 'none';
+        });
+
+        // Form Submission
+        const form = document.getElementById('analyzeForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            btnText.textContent = "Analyzing Satellite Imagery & Policy...";
+            btnSpinner.style.display = "block";
+
+            const formData = new FormData();
+            if (selectedFile) {
+                formData.append('image', selectedFile);
+            }
+            formData.append('policy_text', document.getElementById('policyInput').value);
+            formData.append('total_area_sq_m', document.getElementById('areaInput').value);
+            
+            const demoContext = {
+                poverty_rate_pct: parseFloat(document.getElementById('povertyInput').value),
+                surface_temp_c: parseFloat(document.getElementById('tempInput').value),
+                biome: document.getElementById('biomeSelect').value
+            };
+            formData.append('demographic_context', JSON.stringify(demoContext));
+
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error || `Server responded with ${response.status}`);
+                }
+
+                const data = await response.json();
+                renderResults(data);
+            } catch (err) {
+                alert(`Analysis failed: ${err.message}`);
+                console.error(err);
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = "✨ Run Multimodal Assessment";
+                btnSpinner.style.display = "none";
+            }
+        });
+
+        function renderResults(data) {
+            document.getElementById('emptyPlaceholder').style.display = 'none';
+            document.getElementById('resultsContent').style.display = 'flex';
+
+            const reasoning = data.reasoning_output || {};
+            const vision = data.vision_metrics || {};
+            const biomass = data.biomass_output || {};
+            const equity = data.equity_output || {};
+            const micro = data.microclimate_simulation || {};
+            const graphrag = data.graphrag_analysis || {};
+            const xai = data.xai_rationale || {};
+            const counterfactual = data.counterfactual_analysis || {};
+
+            // 1. Verdict banner
+            const banner = document.getElementById('verdictBanner');
+            const title = document.getElementById('verdictTitle');
+            const rationale = document.getElementById('verdictRationale');
+            const deficitVal = document.getElementById('verdictDeficitVal');
+
+            if (reasoning.is_compliant) {
+                banner.className = 'verdict-banner verdict-compliant';
+                title.textContent = 'COMPLIANT WITH POLICY';
+                deficitVal.textContent = '0.0%';
+                deficitVal.style.color = '#34d399';
+            } else {
+                banner.className = 'verdict-banner verdict-noncompliant';
+                title.textContent = 'NON-COMPLIANT (CANOPY DEFICIT)';
+                deficitVal.textContent = `-${reasoning.afforestation_deficit_percent || 0}%`;
+                deficitVal.style.color = '#f87171';
+            }
+            rationale.textContent = reasoning.compliance_rationale || "Policy evaluation completed.";
+
+            // 2. 4-Panel XAI Map
+            if (data.xai_map_url) {
+                const mapImg = document.getElementById('xaiMapImg');
+                mapImg.src = data.xai_map_url;
+                document.getElementById('downloadMapBtn').href = data.xai_map_url;
+            }
+
+            // 3. Stats Quad
+            const cov = vision.current_canopy_coverage_percent || 0;
+            const area = vision.total_analyzed_area_sq_m || 10000;
+            document.getElementById('statCoverage').textContent = `${cov}%`;
+            document.getElementById('statCanopyArea').textContent = `${Math.round(area * (cov / 100))} m² organic crown`;
+
+            document.getElementById('statAgb').textContent = `${(biomass.total_agb_kg || 0).toLocaleString()} kg`;
+            document.getElementById('statCarbon').textContent = `${biomass.carbon_stored_metric_tons || (biomass.total_carbon_stored_kg ? (biomass.total_carbon_stored_kg/1000).toFixed(2) : 0)} t Carbon Stored`;
+
+            document.getElementById('statTes').textContent = `${equity.tree_equity_score || 0} / 100`;
+            document.getElementById('statPriority').textContent = `Priority E: ${equity.priority_index || 0} (${equity.equity_category || 'N/A'})`;
+
+            document.getElementById('statUtci').textContent = `-${micro.utci_reduction_summer_c || 0}°C`;
+            document.getElementById('statCoolingPotential').textContent = `+${micro.additional_cooling_potential_c || 0}°C potential gain`;
+
+            // 4. Strategic Plan
+            document.getElementById('interventionText').textContent = reasoning.intervention_plan || "Plan not available.";
+
+            // 5. GraphRAG Multi-Hop Legal Knowledge Graph
+            if (graphrag.binding_verdict) {
+                document.getElementById('graphragVerdictText').textContent = graphrag.binding_verdict;
+                document.getElementById('graphragVerdictTag').textContent = reasoning.is_compliant ? "BINDING: COMPLIANT" : "BINDING: DEFICIT";
+            }
+            if (graphrag.contradictions_or_exemptions) {
+                document.getElementById('graphragExemptionsText').textContent = `Exemptions / Variances: ${graphrag.contradictions_or_exemptions}`;
+            }
+
+            // Entities chips
+            const entitiesContainer = document.getElementById('graphragEntitiesContainer');
+            entitiesContainer.innerHTML = '';
+            const entities = graphrag.extracted_entities || [];
+            entities.forEach(ent => {
+                const chip = document.createElement('span');
+                chip.className = 'entity-chip';
+                chip.textContent = ent;
+                entitiesContainer.appendChild(chip);
+            });
+
+            // Constraint table rows
+            const tableBody = document.getElementById('constraintTableBody');
+            tableBody.innerHTML = '';
+            const constraints = graphrag.constraint_graph || [];
+            if (constraints.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">No intersecting constraints mapped.</td></tr>';
+            } else {
+                constraints.forEach(c => {
+                    const tr = document.createElement('tr');
+                    const badgeClass = `badge-type badge-${c.type || 'G'}`;
+                    const typeLabel = c.type === 'G' ? 'Spatial (G)' :
+                                      c.type === 'C' ? 'Capacity (C)' :
+                                      c.type === 'T' ? 'Temporal (T)' :
+                                      c.type === 'E' ? 'Environmental (E)' : c.type;
+                    tr.innerHTML = `
+                        <td style="font-weight: 600; color: #fff;">${c.entity || ''}</td>
+                        <td><span class="${badgeClass}">${typeLabel}</span></td>
+                        <td>${c.detail || ''}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            }
+
+            // Cascading Mandates
+            const cascadingList = document.getElementById('cascadingMandatesList');
+            cascadingList.innerHTML = '';
+            const cascading = graphrag.cascading_mandates || [];
+            if (cascading.length === 0) {
+                cascadingList.innerHTML = '<li>None identified. Baseline mandates apply.</li>';
+            } else {
+                cascading.forEach(m => {
+                    const li = document.createElement('li');
+                    li.textContent = m;
+                    cascadingList.appendChild(li);
+                });
+            }
+
+            // Statutory Actions
+            const actionsList = document.getElementById('statutoryActionsList');
+            actionsList.innerHTML = '';
+            const actions = graphrag.statutory_actions || [];
+            if (actions.length === 0) {
+                actionsList.innerHTML = '<li>No corrective legal actions required.</li>';
+            } else {
+                actions.forEach(a => {
+                    const li = document.createElement('li');
+                    li.textContent = a;
+                    actionsList.appendChild(li);
+                });
+            }
+
+            // 6. XAI Counterfactual Scenarios
+            const scenA = xai.scenario_a_analysis || {};
+            const scenB = xai.scenario_b_analysis || {};
+
+            document.getElementById('scenATemp').textContent = scenA.temp_spike_c || `+${counterfactual.simulated_surface_temp_rise_c || 0}°C`;
+            document.getElementById('scenACarbon').textContent = scenA.carbon_lost_kg_per_year || "0 kg/yr";
+            document.getElementById('scenAViolations').textContent = scenA.new_violations || "Severe municipal thermal violation";
+            document.getElementById('scenAEquity').textContent = scenA.equity_impact || "Tree Equity Score falls to critical levels";
+
+            document.getElementById('scenBBiomass').textContent = `${(scenB.new_biomass_kg || 0).toLocaleString()} kg`;
+            document.getElementById('scenBCarbon').textContent = `${(scenB.new_carbon_kg || 0).toLocaleString()} kg`;
+            document.getElementById('scenBUtci').textContent = scenB.utci_gain_c || "-0.0°C";
+            document.getElementById('scenBTes').textContent = scenB.tes_improvement || "Parity achieved across demographic blocks";
+            document.getElementById('scenBPlanting').textContent = scenB.planting_guidance || "Deploy native shade trees with southern exposure";
+
+            // Attention rationale & confidence
+            document.getElementById('attentionRationaleText').textContent = xai.attention_rationale || "Spatial attention is concentrated on contiguous canopy clusters along southern-facing impervious surfaces.";
+            if (xai.xai_confidence) {
+                document.getElementById('xaiConfidenceBadge').textContent = `Confidence: ${xai.xai_confidence}`;
+            }
+
+            // Scroll to results on mobile
+            if (window.innerWidth < 1120) {
+                banner.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+</body>
+</html>

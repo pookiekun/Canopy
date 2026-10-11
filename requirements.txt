@@ -1,0 +1,24 @@
+# API & Environment
+Flask>=3.0.0
+Flask-Cors>=4.0.0
+python-dotenv>=1.0.0
+
+# Vision & Explainability (XAI)
+torch
+torchvision
+transformers
+Pillow
+matplotlib
+captum
+grad-cam
+
+# Geospatial Processing
+geopandas
+rasterio
+shapely
+
+# Agentic Reasoning
+langchain
+langgraph
+langchain-google-genai
+langchain-openai
